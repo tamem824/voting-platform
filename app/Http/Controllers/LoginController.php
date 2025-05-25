@@ -49,7 +49,7 @@ class LoginController extends Controller
             ]);
 
             if (
-                $voter->verification_code === $request->code &&
+                $voter->verification_code == $request->code &&
                 Carbon::now()->lessThanOrEqualTo($voter->code_expires_at)
             ) {
                 Auth::login($voter);
@@ -57,7 +57,8 @@ class LoginController extends Controller
                     'verification_code' => null,
                     'code_expires_at' => null,
                 ]);
-                return redirect('votes/vote')->with('success', 'تم تسجيل الدخول بنجاح');
+                return redirect()->route('votes.create')->with('success', 'تم تسجيل الدخول بنجاح');
+
             }
 
             return back()->withInput()->with('error', 'رمز التحقق غير صحيح أو منتهي الصلاحية');
