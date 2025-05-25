@@ -17,6 +17,8 @@ class VoteController extends Controller
         $candidates = Candidate::all();
         $presidentCandidates = $candidates->where('type', 'president');
         $memberCandidates = $candidates->where('type', 'member');
+        $settings = Setting::isVotingActive();
+        $is_voted = Voter::hasVoted(auth()->id());
 
         // حساب عدد الأصوات لكل مرشح
         $candidateVotesCount = Vote::select('candidate_id')
@@ -33,6 +35,8 @@ class VoteController extends Controller
             'candidates',
             'candidateVotesCount',
             'totalVotesCount'
+            , 'settings',
+            'is_voted'
         ));
     }
 
@@ -41,7 +45,7 @@ class VoteController extends Controller
     {
         $request->validate([
             'president_id' => 'required|exists:candidates,id',
-            'member_ids'   => 'required|array|size:4',
+            'member_ids' => 'required|array|size:4',
             'member_ids.*' => 'exists:candidates,id',
         ]);
 
@@ -97,15 +101,21 @@ class VoteController extends Controller
     public function results()
     {
         $candidates = Candidate::all();
-        $totalVotes = Vote::count();
 
+        // إجمالي الأصوات حسب نوع المرشح
+        $presidentVotesCount = Vote::whereHas('candidate', fn($q) => $q->where('type', 'president'))->count();
+        $memberVotesCount = Vote::whereHas('candidate', fn($q) => $q->where('type', 'member'))->count();
+
+        // عدد الأصوات لكل مرشح
         $votesPerCandidate = Vote::select('candidate_id', DB::raw('count(*) as total'))
             ->groupBy('candidate_id')
             ->pluck('total', 'candidate_id');
 
-        $data = $candidates->map(function ($candidate) use ($votesPerCandidate, $totalVotes) {
+        $data = $candidates->map(function ($candidate) use ($votesPerCandidate, $presidentVotesCount, $memberVotesCount) {
             $votes = $votesPerCandidate[$candidate->id] ?? 0;
-            $percentage = $totalVotes > 0 ? round(($votes / $totalVotes) * 100, 2) : 0;
+
+            $total = $candidate->type === 'president' ? $presidentVotesCount : $memberVotesCount;
+            $percentage = $total > 0 ? round(($votes / $total) * 100, 2) : 0;
 
             return [
                 'id' => $candidate->id,
@@ -119,4 +129,5 @@ class VoteController extends Controller
 
         return response()->json($data);
     }
+
 }
