@@ -24,5 +24,8 @@ Route::prefix('admin')->middleware(['auth', \App\Http\Middleware\IsAdmin::class]
     Route::get('/', [App\Http\Controllers\AdminController::class, 'votedVoters'])->name('admin.voters');
     Route::get('/settings', [App\Http\Controllers\AdminController::class, 'settings'])->name('admin.settings');
     Route::post('/settings/update', [App\Http\Controllers\AdminController::class, 'updateSettings'])->name('admin.settings.update');
+    Route::get('/vote-logs', [App\Http\Controllers\AdminController::class, 'voteLogs'])->name('admin.vote_logs');
+    Route::get('/voters/{voter}', [App\Http\Controllers\AdminController::class, 'show'])->name('admin.voters.show');
+
 });
 

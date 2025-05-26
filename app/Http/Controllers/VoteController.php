@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\VoteLog;
 use Illuminate\Http\Request;
 use App\Models\Voter;
 use App\Models\Candidate;
@@ -92,10 +93,23 @@ class VoteController extends Controller
 
             // تحديث حالة المصوت
             $voter->update(['has_voted' => true]);
+
+            // تسجيل معلومات الجهاز
+            $userAgent = $request->header('User-Agent');
+            $platform = php_uname('s') ?? 'unknown';
+
+            VoteLog::create([
+                'voter_id' => $voter->id,
+                'ip_address' => $request->ip(),
+                'browser' => $this->getBrowser($userAgent),
+                'platform' => $platform,
+                'user_agent' => $userAgent,
+            ]);
         });
 
         return back()->with('success', 'تم تسجيل التصويت بنجاح.');
     }
+
 
     // API: نتائج التصويت بصيغة JSON
     public function results()
@@ -129,5 +143,16 @@ class VoteController extends Controller
 
         return response()->json($data);
     }
+    private function getBrowser($userAgent)
+    {
+        if (strpos($userAgent, 'Firefox') !== false) return 'Firefox';
+        if (strpos($userAgent, 'Chrome') !== false) return 'Chrome';
+        if (strpos($userAgent, 'Safari') !== false && strpos($userAgent, 'Chrome') === false) return 'Safari';
+        if (strpos($userAgent, 'Edge') !== false) return 'Edge';
+        if (strpos($userAgent, 'Opera') !== false || strpos($userAgent, 'OPR') !== false) return 'Opera';
+        if (strpos($userAgent, 'MSIE') !== false || strpos($userAgent, 'Trident') !== false) return 'Internet Explorer';
+        return 'Unknown';
+    }
+
 
 }

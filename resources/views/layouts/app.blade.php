@@ -34,6 +34,9 @@
                                 <x-nav-link href="{{ route('admin.settings') }}" :active="Route::is('admin.settings')">
                                     الإعدادات
                                 </x-nav-link>
+                                    <x-nav-link href="{{ route('admin.vote_logs') }}" :active="Route::is('admin.vote_logs')">
+                                    Vote Log
+                                </x-nav-link>
                             @endif
                             @endauth
 

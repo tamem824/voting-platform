@@ -2,37 +2,49 @@
 
 @section('content')
     <div class="container mx-auto max-w-4xl p-6">
-        <h2 class="text-2xl font-bold mb-4 text-center">قائمة المصوتين</h2>
+        <h2 class="text-3xl font-bold mb-6 text-center text-blue-700">قائمة المصوتين</h2>
 
         @if(session('success'))
-            <div class="bg-green-100 text-green-700 p-4 rounded mb-4">{{ session('success') }}</div>
+            <div class="bg-green-100 text-green-800 p-4 rounded mb-6 shadow">
+                {{ session('success') }}
+            </div>
         @endif
 
         @if($voters->isEmpty())
-            <p class="text-center text-gray-600">لا يوجد مصوتين حتى الآن.</p>
+            <p class="text-center text-gray-500 text-lg">لا يوجد مصوتين حتى الآن.</p>
         @else
-            <table class="w-full table-auto border border-gray-200 rounded bg-white shadow">
-                <thead>
-                <tr class="bg-gray-100 text-right">
-                    <th class="p-2 border">#</th>
-                    <th class="p-2 border">الاسم</th>
-                    <th class="p-2 border">رقم العضوية</th>
-                    <th class="p-2 border">رقم الهاتف</th>
-                    <th class="p-2 border">وقت التسجيل</th>
-                </tr>
-                </thead>
-                <tbody>
-                @foreach($voters as $voter)
+            <div class="overflow-x-auto rounded-lg shadow border border-gray-200">
+                <table class="min-w-full divide-y divide-gray-200 table-auto text-right">
+                    <thead class="bg-gray-100">
                     <tr>
-                        <td class="p-2 border">{{ $loop->iteration }}</td>
-                        <td class="p-2 border">{{ $voter->name }}</td>
-                        <td class="p-2 border">{{ $voter->membership_number }}</td>
-                        <td class="p-2 border">{{ $voter->phone }}</td>
-                        <td class="p-2 border">{{ $voter->updated_at->format('Y-m-d H:i') }}</td>
+                        <th class="px-4 py-3 text-sm font-semibold text-gray-700 border border-gray-200">#</th>
+                        <th class="px-4 py-3 text-sm font-semibold text-gray-700 border border-gray-200">الاسم</th>
+                        <th class="px-4 py-3 text-sm font-semibold text-gray-700 border border-gray-200">رقم العضوية</th>
+                        <th class="px-4 py-3 text-sm font-semibold text-gray-700 border border-gray-200">رقم الهاتف</th>
+                        <th class="px-4 py-3 text-sm font-semibold text-gray-700 border border-gray-200">وقت التسجيل</th>
+                        <th class="px-4 py-3 text-sm font-semibold text-gray-700 border border-gray-200">الإجراءات</th>
                     </tr>
-                @endforeach
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-100">
+                    @foreach($voters as $voter)
+                        <tr class="{{ $loop->even ? 'bg-gray-50' : '' }}">
+                            <td class="px-4 py-3 text-sm border border-gray-200">{{ $loop->iteration }}</td>
+                            <td class="px-4 py-3 text-sm border border-gray-200">{{ $voter->name }}</td>
+                            <td class="px-4 py-3 text-sm border border-gray-200">{{ $voter->membership_number }}</td>
+                            <td class="px-4 py-3 text-sm border border-gray-200">{{ $voter->phone }}</td>
+                            <td class="px-4 py-3 text-sm border border-gray-200">{{ $voter->updated_at->format('Y-m-d H:i') }}</td>
+                            <td class="px-4 py-3 text-sm border border-gray-200 text-center">
+                                <a href="{{ route('admin.voters.show', $voter->id) }}"
+                                   class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm">
+                                     التفاصيل
+                                </a>
+                            </td>
+                        </tr>
+                    @endforeach
+                    </tbody>
+                </table>
+
+            </div>
         @endif
     </div>
 @endsection

@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\Models\VoteLog;
 use Illuminate\Http\Request;
 use App\Models\Voter;
 use App\Models\Setting;
@@ -36,4 +37,15 @@ class AdminController extends Controller
 
         return back()->with('success', 'تم تحديث إعدادات التصويت بنجاح.');
     }
+    public function voteLogs()
+    {
+        $logs = VoteLog::with('voter')->latest()->paginate(20);
+        return view('admin.vote_logs', compact('logs'));
+    }
+    public function show($id)
+    {
+        $voter = Voter::findOrFail($id);
+        return view('admin.show', compact('voter'));
+    }
+
 }
