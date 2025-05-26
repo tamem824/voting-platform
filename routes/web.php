@@ -8,10 +8,13 @@ use App\Http\Controllers\VoteController;
 
 
 Route::middleware(['auth'])->group(function () {
-    Route::get('/', [VoteController::class, 'create'])->name('votes.create');
+    Route::get('/', [VoteController::class, 'create'])->name('votes.home');
     Route::get('/vote', [VoteController::class, 'create'])->name('votes.create');
     Route::post('/vote', [VoteController::class, 'store'])->name('votes.store');
     Route::get('/vote/results', [VoteController::class, 'results'])->name('votes.results');
+    Route::get('/candidates/{id}',[VoteController::class ,'show'])->name('candidates.show');
+    Route::get('/winners', [VoteController::class, 'winners'])->name('votes.winners');
+
 });
 
 

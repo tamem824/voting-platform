@@ -143,6 +143,43 @@ class VoteController extends Controller
 
         return response()->json($data);
     }
+    public function show($id)
+    {
+        $candidate = Candidate::findOrFail($id);
+
+
+        $votesCount = $candidate->votes()->count();
+
+        $totalVotes = \App\Models\Vote::count();
+        $percentage = $totalVotes > 0 ? round(($votesCount / $totalVotes) * 100, 2) : 0;
+
+        return view('votes.candidatesShow', compact('candidate', 'votesCount', 'percentage'));
+    }
+    public function winners()
+    {
+        // حساب أعلى مرشح للرئاسة
+        $president = Vote::select('candidate_id', DB::raw('count(*) as total'))
+            ->whereHas('candidate', fn($q) => $q->where('type', 'president'))
+            ->groupBy('candidate_id')
+            ->orderByDesc('total')
+            ->first();
+
+        $presidentWinner = $president ? Candidate::find($president->candidate_id) : null;
+
+        // حساب أعلى 4 أعضاء
+        $memberVotes = Vote::select('candidate_id', DB::raw('count(*) as total'))
+            ->whereHas('candidate', fn($q) => $q->where('type', 'member'))
+            ->groupBy('candidate_id')
+            ->orderByDesc('total')
+            ->limit(4)
+            ->get();
+
+        $memberWinners = Candidate::whereIn('id', $memberVotes->pluck('candidate_id'))->get();
+
+        return view('votes.winners', compact('presidentWinner', 'memberWinners'));
+    }
+
+
     private function getBrowser($userAgent)
     {
         if (strpos($userAgent, 'Firefox') !== false) return 'Firefox';
