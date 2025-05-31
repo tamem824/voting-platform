@@ -4,8 +4,8 @@
     <div class="container mx-auto p-6 max-w-3xl bg-white rounded-lg shadow-md">
         <div class="flex justify-end mb-4">
             <a href="{{ route('votes.create') }}"
-               class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-medium transition duration-200">
-                العودة لصفحة النتائج →
+               class="bg-blue-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-lg font-medium transition duration-200">
+                العودة لصفحة التصويت →
             </a>
         </div>
 
@@ -39,7 +39,8 @@
             {{-- عدد الأصوات والنسبة --}}
             <div class="mb-6 text-lg leading-relaxed text-gray-800 px-2">
                 عدد الأصوات: <span class="font-semibold text-green-600">{{ $votesCount }}</span><br>
-                نسبة التصويت: <span class="font-semibold text-green-600">% {{ $percentage }}</span>
+                نسبة التصويت: <span class="font-semibold text-green-600">% {{ number_format($percentage, 2) }}
+</span>
             </div>
 
             {{-- نبذة عن المرشح --}}

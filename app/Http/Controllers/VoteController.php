@@ -147,14 +147,21 @@ class VoteController extends Controller
     {
         $candidate = Candidate::findOrFail($id);
 
-
         $votesCount = $candidate->votes()->count();
 
-        $totalVotes = \App\Models\Vote::count();
+
+        $type = $candidate->type;
+
+        // اجلب عدد الأصوات لجميع المرشحين من نفس النوع
+        $totalVotes = \App\Models\Vote::whereHas('candidate', function ($query) use ($type) {
+            $query->where('type', $type);
+        })->count();
+
         $percentage = $totalVotes > 0 ? round(($votesCount / $totalVotes) * 100, 2) : 0;
 
         return view('votes.candidatesShow', compact('candidate', 'votesCount', 'percentage'));
     }
+
     public function winners()
     {
         // حساب أعلى مرشح للرئاسة
@@ -163,6 +170,7 @@ class VoteController extends Controller
             ->groupBy('candidate_id')
             ->orderByDesc('total')
             ->first();
+
 
         $presidentWinner = $president ? Candidate::find($president->candidate_id) : null;
 

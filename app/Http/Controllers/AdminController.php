@@ -29,14 +29,26 @@ class AdminController extends Controller
         ]);
 
         $setting = Setting::first();
-        $setting->update([
-            'starting_vote' => $request->starting_vote,
-            'ending_vote' => $request->ending_vote,
-            'is_active' => $request->is_active,
-        ]);
+
+        // إذا تاريخ النهاية قد مضى، نوقف التصويت تلقائيًا
+        if ($request->ending_vote <= now()) {
+            $setting->update([
+                'starting_vote' => $request->starting_vote,
+                'ending_vote' => $request->ending_vote,
+                'is_active' => false,
+            ]);
+        } else {
+            // تحديث طبيعي
+            $setting->update([
+                'starting_vote' => $request->starting_vote,
+                'ending_vote' => $request->ending_vote,
+                'is_active' => $request->is_active,
+            ]);
+        }
 
         return back()->with('success', 'تم تحديث إعدادات التصويت بنجاح.');
     }
+
     public function voteLogs()
     {
         $logs = VoteLog::with('voter')->latest()->paginate(20);
