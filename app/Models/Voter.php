@@ -20,4 +20,10 @@ class Voter extends  Authenticatable
     {
         return $this->hasMany(Vote::class);
     }
+    public static function hasVoted($id)
+    {
+        $voter = Voter::findOrFail($id);
+        return $voter->has_voted;
+    }
+
 }
